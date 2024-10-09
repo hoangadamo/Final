@@ -8,5 +8,6 @@ import { Store } from 'src/database/entities/stores.model';
   imports: [SequelizeModule.forFeature([Store])],
   controllers: [StoresController],
   providers: [StoresService],
+  exports: [StoresService],
 })
 export class StoresModule {}
