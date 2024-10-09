@@ -12,7 +12,6 @@ export class UserGuard implements CanActivate {
     const authorization = req.headers.authorization || String(req.cookies.JWT);
     const userInfo = await this.verifyAccessToken(authorization);
     req.user = userInfo;
-
     return true;
   }
 

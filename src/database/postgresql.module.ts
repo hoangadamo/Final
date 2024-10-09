@@ -12,6 +12,7 @@ import * as models from './entities';
       useFactory: () => ({
         dialect: 'postgres',
         autoLoadModels: false,
+        synchronize: false,
         models: Object.values(models),
         logging: false,
         query: {
