@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const dotenv = require('dotenv');
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 module.exports = {
@@ -14,6 +14,6 @@ module.exports = {
     dialectOptions: {
       bigNumberStrings: true,
     },
-    seederStorage: 'sequelize'
+    seederStorage: 'sequelize',
   },
 };

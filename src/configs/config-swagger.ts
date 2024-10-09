@@ -3,11 +3,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 export const swaggerConfig = (app: NestExpressApplication): void => {
   const config = new DocumentBuilder()
-    .setTitle('New base NestJS API')
-    .setDescription('This is the new base API documentation!')
+    .setTitle('Loyalty System')
+    .setDescription('This is the API documentation!')
     .setVersion('1.0')
     .addTag('users')
-    .addTag('upload')
     .addBearerAuth()
     .addSecurity('basic', {
       type: 'http',
