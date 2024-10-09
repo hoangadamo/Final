@@ -19,13 +19,13 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    'import/order': [
-      'error',
-      {
-        'newlines-between': 'always',
-        groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
-      },
-    ],
+    // 'import/order': [
+    //   'error',
+    //   {
+    //     'newlines-between': 'always',
+    //     groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
+    //   },
+    // ],
     'import/no-unresolved': ['off'], // Ensures an imported module can be resolved to a module on the local filesystem
     '@typescript-eslint/no-empty-interface': [
       'error',
@@ -33,9 +33,9 @@ module.exports = {
         'allowSingleExtends': false
       }
     ],
-    '@typescript-eslint/explicit-function-return-type': ['warn'],
-    '@typescript-eslint/explicit-module-boundary-types': ['warn'],
-    '@typescript-eslint/no-explicit-any': ['warn'],
+    // '@typescript-eslint/explicit-function-return-type': ['warn'],
+    // '@typescript-eslint/explicit-module-boundary-types': ['warn'],
+    // '@typescript-eslint/no-explicit-any': ['warn'],
     '@typescript-eslint/ban-ts-comment': ['off'],
     '@typescript-eslint/no-unused-vars': ['warn'],
     '@typescript-eslint/semi': ['error', 'always'],
