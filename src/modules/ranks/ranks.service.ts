@@ -16,9 +16,8 @@ export class RanksService {
     if (existingRank) {
       ErrorHelper.BadRequestException('rank already exists');
     }
-    const newRank = await this.ranksRepository.create({
+    return await this.ranksRepository.create({
       ...payload,
     });
-    return newRank;
   }
 }
