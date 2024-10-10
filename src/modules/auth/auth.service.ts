@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { LoginDTO, RegisterDTO } from './dto';
+import { LoginDTO, RegisterDTO, SendOTPDto, VerifyOTPDto } from './dto';
 import { User } from 'src/database';
 import * as bcrypt from 'bcrypt';
 import {
@@ -98,7 +98,8 @@ export class AuthService {
     };
   }
 
-  async sendOTP(email: string, hash: string): Promise<string> {
+  async sendOTP(payload: SendOTPDto): Promise<string> {
+    const { email, hash } = payload;
     const user = await this.usersRepository.findOne({ where: [{ email }] });
     if (!user) {
       ErrorHelper.NotFoundException('user not found');
@@ -129,10 +130,17 @@ export class AuthService {
         isVerified: false,
       }),
     );
+
+    await this.usersRepository.update(
+      { otp: OTP, otpExpireTime: emailSender.otpTimeExpire },
+      { where: { email } },
+    );
+
     return hashCode;
   }
 
-  async verifyOTP(otp: string, hash: string): Promise<string> {
+  async verifyOTP(payload: VerifyOTPDto): Promise<string> {
+    const { otp, hash } = payload;
     const checkHashInfo = CommonHelper.checkHashData(hash);
     if (!checkHashInfo) {
       ErrorHelper.BadRequestException(APPLICATION.VERIFY_FAIL);

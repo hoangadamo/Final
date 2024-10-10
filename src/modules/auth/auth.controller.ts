@@ -36,8 +36,7 @@ export class AuthController {
   @Post('/send-otp')
   @HttpCode(200)
   async sendOtp(@Body() payload: SendOTPDto) {
-    const { email, hash } = payload;
-    const result = await this.authService.sendOTP(email, hash);
+    const result = await this.authService.sendOTP(payload);
     return {
       hash: result,
     };
@@ -46,8 +45,7 @@ export class AuthController {
   @Post('/verify-otp')
   @HttpCode(200)
   async verifyOtp(@Body() payload: VerifyOTPDto) {
-    const { otp, hash } = payload;
-    const result = await this.authService.verifyOTP(otp, hash);
+    const result = await this.authService.verifyOTP(payload);
     return {
       hash: result,
     };
