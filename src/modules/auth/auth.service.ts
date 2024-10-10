@@ -67,7 +67,7 @@ export class AuthService {
     };
   }
 
-  async login(body: LoginDTO): Promise<Promise<ILoginResponse>> {
+  async login(body: LoginDTO): Promise<ILoginResponse> {
     const { password, email } = body;
     const user = await this.usersRepository.findOne({
       where: {
