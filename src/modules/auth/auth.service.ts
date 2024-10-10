@@ -14,7 +14,7 @@ import { APPLICATION, OTP, USER } from 'src/constants';
 import { ILoginResponse, IToken } from 'src/interfaces';
 import { emailSender, token } from 'src/configs';
 import moment from 'moment';
-import * as md5 from 'md5';
+import md5 from 'md5';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +41,7 @@ export class AuthService {
       ...payload,
       password: hashed,
       isAdmin: false,
+      isVerify: false,
       otp: '0000',
       otpExpireTime: 10,
       rankId: 1,
@@ -81,7 +82,7 @@ export class AuthService {
       ErrorHelper.BadRequestException(USER.USER_NOT_FOUND);
     }
 
-    if (user.otp !== 'veri') {
+    if (!user.isVerify) {
       ErrorHelper.BadRequestException('user is not verified');
     }
 
@@ -113,8 +114,6 @@ export class AuthService {
 
     const OTP = CommonHelper.generateOTP();
     console.log('OTP: ', OTP);
-    // set user OTP
-    await this.usersRepository.update({ otp: OTP }, { where: [{ email }] });
 
     SendEmailHelper.sendOTP({
       to: email,
@@ -148,10 +147,8 @@ export class AuthService {
       ErrorHelper.InternalServerErrorException(OTP.OTP_INVALID);
     }
 
-    // set user otp to be 'veri'
-    console.log(hashInfo.email);
     await this.usersRepository.update(
-      { otp: 'veri' },
+      { isVerify: true },
       { where: { email: hashInfo.email } },
     );
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import * as dotenv from 'dotenv';
+const dotenv = require('dotenv');
 dotenv.config();
 
 module.exports = {

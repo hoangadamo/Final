@@ -81,6 +81,12 @@ export class User extends Model {
   })
   isAdmin: boolean;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  isVerify: boolean;
+
   @ForeignKey(() => Rank)
   @Column({ type: DataType.INTEGER })
   rankId: number;
