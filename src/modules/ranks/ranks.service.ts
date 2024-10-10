@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { RanksRepository } from './ranks.repository';
 import { CreateRankDTO } from './dto';
 import { ErrorHelper } from 'src/utils';
-import { IRank } from 'src/interfaces';
+import { Rank } from 'src/database';
 
 @Injectable()
 export class RanksService {
   constructor(private ranksRepository: RanksRepository) {}
 
-  async createRank(payload: CreateRankDTO): Promise<IRank> {
+  async createRank(payload: CreateRankDTO): Promise<Rank> {
     const { name } = payload;
     const existingRank = await this.ranksRepository.findOne({
       where: [{ name: name }],

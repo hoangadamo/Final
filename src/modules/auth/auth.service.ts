@@ -4,21 +4,19 @@ import { LoginDTO, RegisterDTO } from './dto';
 import { User } from 'src/database';
 import * as bcrypt from 'bcrypt';
 import {
-  CommonHelper,
-  EncryptHelper,
   ErrorHelper,
   TokenHelper,
 } from 'src/utils';
 import { UsersRepository } from '../users';
 import { USER } from 'src/constants';
-import { ILoginResponse, IToken, IUser } from 'src/interfaces';
+import { ILoginResponse, IToken } from 'src/interfaces';
 import { token } from 'src/configs';
 
 @Injectable()
 export class AuthService {
   constructor(private usersRepository: UsersRepository) {}
 
-  async register(payload: RegisterDTO): Promise<IUser> {
+  async register(payload: RegisterDTO): Promise<User> {
     const { name, phone, email, password } = payload;
 
     if (!name || !phone || !email || !password) {
