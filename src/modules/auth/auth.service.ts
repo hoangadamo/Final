@@ -11,14 +11,14 @@ import {
 } from 'src/utils';
 import { UsersRepository } from '../users';
 import { USER } from 'src/constants';
-import { IToken } from 'src/interfaces';
+import { ILoginResponse, IToken, IUser } from 'src/interfaces';
 import { token } from 'src/configs';
 
 @Injectable()
 export class AuthService {
   constructor(private usersRepository: UsersRepository) {}
 
-  async register(payload: RegisterDTO): Promise<object> {
+  async register(payload: RegisterDTO): Promise<IUser> {
     const { name, phone, email, password } = payload;
 
     if (!name || !phone || !email || !password) {
@@ -45,9 +45,7 @@ export class AuthService {
     });
     const user = newUser.dataValues;
     delete user.password;
-    return {
-      user,
-    };
+    return user;
   }
 
   private generateToken(payload: object): IToken {
@@ -69,7 +67,7 @@ export class AuthService {
     };
   }
 
-  async login(body: LoginDTO): Promise<object> {
+  async login(body: LoginDTO): Promise<Promise<ILoginResponse>> {
     const { password, email } = body;
     const user = await this.usersRepository.findOne({
       where: {

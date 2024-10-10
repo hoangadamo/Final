@@ -1,23 +1,42 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsMobilePhone,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDTO {
+  @IsNotEmpty()
   @IsString()
   name: string;
 
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @MinLength(10)
+  @IsNotEmpty()
+//   @IsMobilePhone('vi-VN')
   phone: string;
 
-  @MinLength(8)
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, // minlength: 8, atleast 1 lowercase, 1 uppercase, 1 number, 1 special character
+    {
+      message: 'password too weak',
+    },
+  )
   password: string;
 }
 
 export class LoginDTO {
-  @IsEmail()
+  @IsNotEmpty()
+  @IsEmail({}, { message: 'invalid email format' })
   email: string;
 
-  @MinLength(8)
+  @IsNotEmpty()
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, // minlength: 8, atleast 1 lowercase, 1 uppercase, 1 number, 1 special character
+  )
   password: string;
 }
