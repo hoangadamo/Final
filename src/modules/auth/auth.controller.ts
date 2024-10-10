@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, RegisterDTO } from './dto';
+import { LoginDTO, RegisterDTO, SendOTPDto, VerifyOTPDto } from './dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -31,5 +31,23 @@ export class AuthController {
   @HttpCode(200)
   async login(@Body() payload: LoginDTO) {
     return this.authService.login(payload);
+  }
+
+  @Post('/send-otp')
+  @HttpCode(200)
+  async sendOtp(@Body() payload: SendOTPDto) {
+    const result = await this.authService.sendOTP(payload);
+    return {
+      hash: result,
+    };
+  }
+
+  @Post('/verify-otp')
+  @HttpCode(200)
+  async verifyOtp(@Body() payload: VerifyOTPDto) {
+    const result = await this.authService.verifyOTP(payload);
+    return {
+      hash: result,
+    };
   }
 }

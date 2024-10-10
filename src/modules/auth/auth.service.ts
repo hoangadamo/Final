@@ -1,16 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { LoginDTO, RegisterDTO } from './dto';
+import { LoginDTO, RegisterDTO, SendOTPDto, VerifyOTPDto } from './dto';
 import { User } from 'src/database';
 import * as bcrypt from 'bcrypt';
 import {
+  CommonHelper,
   ErrorHelper,
+  SendEmailHelper,
   TokenHelper,
 } from 'src/utils';
 import { UsersRepository } from '../users';
-import { USER } from 'src/constants';
+import { APPLICATION, OTP, USER } from 'src/constants';
 import { ILoginResponse, IToken } from 'src/interfaces';
-import { token } from 'src/configs';
+import { emailSender, token } from 'src/configs';
+import moment from 'moment';
+import md5 from 'md5';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +41,8 @@ export class AuthService {
       ...payload,
       password: hashed,
       isAdmin: false,
-      otp: 1000,
+      isVerify: false,
+      otp: '0000',
       otpExpireTime: 10,
       rankId: 1,
     });
@@ -76,6 +81,11 @@ export class AuthService {
     if (!user) {
       ErrorHelper.BadRequestException(USER.USER_NOT_FOUND);
     }
+
+    if (!user.isVerify) {
+      ErrorHelper.BadRequestException('user is not verified');
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword)
       ErrorHelper.BadRequestException(USER.INVALID_PASSWORD);
@@ -86,5 +96,78 @@ export class AuthService {
       ...token,
       user,
     };
+  }
+
+  async sendOTP(payload: SendOTPDto): Promise<string> {
+    const { email, hash } = payload;
+    const user = await this.usersRepository.findOne({ where: [{ email }] });
+    if (!user) {
+      ErrorHelper.NotFoundException('user not found');
+    }
+    const checkHash = md5(
+      email + emailSender.secretKeySendGmail + moment().format('DD/MM/YYYY'),
+    );
+    console.log('check-hash: ', checkHash);
+
+    if (checkHash !== hash) {
+      ErrorHelper.InternalServerErrorException(APPLICATION.HASH_IS_NOT_CORRECT);
+    }
+
+    const OTP = CommonHelper.generateOTP();
+    console.log('OTP: ', OTP);
+
+    SendEmailHelper.sendOTP({
+      to: email,
+      subject: 'Confirm OTP',
+      OTP,
+    });
+
+    const hashCode = CommonHelper.hashData(
+      JSON.stringify({
+        otp: OTP,
+        time: moment().add(emailSender.otpTimeExpire, 'second').valueOf(),
+        email,
+        isVerified: false,
+      }),
+    );
+
+    await this.usersRepository.update(
+      { otp: OTP, otpExpireTime: emailSender.otpTimeExpire },
+      { where: { email } },
+    );
+
+    return hashCode;
+  }
+
+  async verifyOTP(payload: VerifyOTPDto): Promise<string> {
+    const { otp, hash } = payload;
+    const checkHashInfo = CommonHelper.checkHashData(hash);
+    if (!checkHashInfo) {
+      ErrorHelper.BadRequestException(APPLICATION.VERIFY_FAIL);
+    }
+
+    const hashInfo = JSON.parse(checkHashInfo);
+    if (hashInfo.time < new Date().getTime()) {
+      ErrorHelper.InternalServerErrorException(OTP.OTP_TIMEOUT);
+    }
+
+    if (otp !== hashInfo.otp) {
+      ErrorHelper.InternalServerErrorException(OTP.OTP_INVALID);
+    }
+
+    await this.usersRepository.update(
+      { isVerify: true },
+      { where: { email: hashInfo.email } },
+    );
+
+    const hashCode = CommonHelper.hashData(
+      JSON.stringify({
+        time: moment().add(emailSender.otpTimeExpire, 'second').valueOf(),
+        email: hashInfo.email,
+        isVerified: true,
+      }),
+    );
+
+    return hashCode;
   }
 }
