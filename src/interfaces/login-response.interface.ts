@@ -8,7 +8,7 @@ export interface ILoginResponse {
     email: string;
     phone: string;
     isAdmin: boolean;
-    otp: number;
+    otp: string;
     otpExpireTime: number;
     rankId: number;
   };

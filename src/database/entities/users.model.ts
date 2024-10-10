@@ -63,13 +63,10 @@ export class User extends Model {
   points: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
-    validate: {
-      len: [4, 4], // OTP is 4 digits
-    },
   })
-  otp: number;
+  otp: string;
 
   @Column({
     type: DataType.INTEGER,
