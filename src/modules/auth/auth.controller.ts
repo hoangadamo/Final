@@ -8,17 +8,27 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, RegisterDTO, SendOTPDto, VerifyOTPDto } from './dto';
+import {
+  LoginDTO,
+  RegisterDTO,
+  SendOTPDto,
+  StoreRegisterDTO,
+  VerifyOTPDto,
+} from './dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
-  async register(@Body() payload: RegisterDTO): Promise<any> {
+  async register(@Body() payload: RegisterDTO) {
     return await this.authService.register(payload);
+  }
+
+  @Post('store-register')
+  async storeRegister(@Body() payload: StoreRegisterDTO) {
+    return await this.authService.storeRegister(payload);
   }
 
   @ApiOperation({ summary: 'API Login' })

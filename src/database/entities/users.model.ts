@@ -70,10 +70,9 @@ export class User extends Model {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 10 * 60 * 1000, // default: 10 minutes
+    allowNull: true,
   })
-  otpExpireTime: number; // miliseconds
+  otpExpireTime: number;
 
   @Column({
     type: DataType.BOOLEAN,

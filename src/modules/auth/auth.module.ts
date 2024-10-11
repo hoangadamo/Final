@@ -4,12 +4,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from 'src/database';
-import { UsersModule } from '../users';
+import { Store, User } from 'src/database';
+import { UsersRepository } from '../users';
+import { StoresRepository } from '../stores';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User]), UsersModule],
+  imports: [SequelizeModule.forFeature([User, Store])],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, StoresRepository, UsersRepository],
 })
 export class AuthModule {}
