@@ -60,9 +60,8 @@ export class Store extends Model {
   otp: string;
 
   @Column({
-    type: DataType.BIGINT,
-    allowNull: false,
-    defaultValue: 0,
+    type: DataType.INTEGER,
+    allowNull: true,
   })
   otpExpireTime: number;
 

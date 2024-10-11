@@ -70,8 +70,7 @@ export class User extends Model {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
+    allowNull: true,
   })
   otpExpireTime: number;
 

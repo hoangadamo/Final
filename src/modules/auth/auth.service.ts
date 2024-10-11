@@ -52,8 +52,6 @@ export class AuthService {
       password: hashed,
       isAdmin: false,
       isVerify: false,
-      otp: '0000',
-      otpExpireTime: 0,
       rankId: 1,
     });
     const user = newUser.dataValues;
@@ -82,8 +80,6 @@ export class AuthService {
       ...payload,
       password: hashed,
       isApproved: false,
-      otp: '0000',
-      otpExpireTime: 0,
     });
     const store = newStore.dataValues;
     delete store.password;
@@ -175,6 +171,11 @@ export class AuthService {
       { where: { email } },
     );
 
+    await this.storesRepository.update(
+      { otp: OTP, otpExpireTime: emailSender.otpTimeExpire },
+      { where: { email } },
+    );
+
     return hashCode;
   }
 
@@ -195,6 +196,11 @@ export class AuthService {
     }
 
     await this.usersRepository.update(
+      { isVerify: true },
+      { where: { email: hashInfo.email } },
+    );
+
+    await this.storesRepository.update(
       { isVerify: true },
       { where: { email: hashInfo.email } },
     );
