@@ -1,5 +1,13 @@
-import { Controller, Param, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { StoresService } from './stores.service';
+import { GetListStoresDto } from './dto';
 
 @Controller('stores')
 export class StoresController {
@@ -7,5 +15,15 @@ export class StoresController {
   @Put(':id')
   async approve(@Param('id') id: number) {
     return this.storesService.approve(id);
+  }
+
+  @Get()
+  async getListStores(@Query() payload: GetListStoresDto) {
+    return await this.storesService.getListStores(payload);
+  }
+
+  @Get(':id')
+  async getUserDetails(@Param('id', ParseIntPipe) id: number) {
+    return await this.storesService.getStoreDetails(id);
   }
 }
