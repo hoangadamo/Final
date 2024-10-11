@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -25,5 +26,10 @@ export class StoresController {
   @Get(':id')
   async getUserDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.storesService.getStoreDetails(id);
+  }
+
+  @Delete(':id')
+  async deleteStore(@Param('id', ParseIntPipe) id: number) {
+    return await this.storesService.deleteStore(id);
   }
 }
