@@ -5,10 +5,11 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { RanksService } from './ranks.service';
-import { CreateRankDTO, GetListRanksDto } from './dto';
+import { CreateRankDTO, GetListRanksDto, UpdateRankDto } from './dto';
 
 @Controller('ranks')
 export class RanksController {
@@ -27,5 +28,13 @@ export class RanksController {
   @Get(':id')
   async getRankDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.ranksService.getRankDetails(id);
+  }
+
+  @Put(':id')
+  async updateRank(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateRankDto,
+  ) {
+    return await this.ranksService.updateRank(id, payload);
   }
 }

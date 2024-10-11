@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsNotEmpty,
   IsNumber,
@@ -44,3 +45,5 @@ export class GetListRanksDto {
   @IsOptional()
   limit?: number;
 }
+
+export class UpdateRankDto extends PartialType(CreateRankDTO) {}
