@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -36,5 +37,10 @@ export class RanksController {
     @Body() payload: UpdateRankDto,
   ) {
     return await this.ranksService.updateRank(id, payload);
+  }
+
+  @Delete(':id')
+  async deleteRank(@Param('id', ParseIntPipe) id: number) {
+    return await this.ranksService.deleteRank(id);
   }
 }

@@ -4,7 +4,6 @@ import { CreateRankDTO, GetListRanksDto, UpdateRankDto } from './dto';
 import { ErrorHelper } from 'src/utils';
 import { Rank } from 'src/database';
 import { IPaginationRes } from 'src/interfaces';
-import { Op } from 'sequelize';
 import { FIRST_PAGE, LIMIT_PAGE } from 'src/constants';
 
 @Injectable()
@@ -65,5 +64,14 @@ export class RanksService {
 
     await this.ranksRepository.update(data, { where: [{ id }] });
     return await this.ranksRepository.findOne({ where: [{ id }] });
+  }
+
+  async deleteRank(id: number): Promise<string> {
+    const rank = await this.ranksRepository.findOne({ where: [{ id }] });
+    if (!rank) {
+      ErrorHelper.BadRequestException('rank not found');
+    }
+    await this.ranksRepository.delete({ where: [{ id }] });
+    return 'delete successfully';
   }
 }
