@@ -1,14 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumberString, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNumberString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class GetListUserDto {
   @IsOptional()
-  @IsNumberString()
-  page?: string;
+  page?: number;
 
   @IsOptional()
-  @IsNumberString()
-  limit?: string;
+  limit?: number;
+
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  isVerify?: boolean;
 }
 
 export class CreateUserDto {
