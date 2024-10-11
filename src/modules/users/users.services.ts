@@ -56,7 +56,7 @@ export class UsersService {
     }
 
     const { name, email, phone } = payload;
-    const data: any = {};
+    const data: Partial<UpdateUserDto> = {};
     if (name) data.name = name;
     if (email) data.email = email;
     if (phone) data.phone = phone;
