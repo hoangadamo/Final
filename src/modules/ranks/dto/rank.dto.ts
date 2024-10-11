@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateRankDTO {
   @IsNotEmpty()
@@ -29,4 +35,12 @@ export class CreateRankDTO {
   @IsNumber()
   @Min(0, { message: 'maxPercentagePoints must be a non-negative number' })
   maxPercentagePoints: number;
+}
+
+export class GetListRanksDto {
+  @IsOptional()
+  page?: number;
+
+  @IsOptional()
+  limit?: number;
 }
