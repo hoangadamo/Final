@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { GetListUserDto, UpdateUserDto } from './dto';
+import { ChangePasswordDto, GetListUserDto, UpdateUserDto } from './dto';
 import { UsersService } from './users.services';
 
 @ApiTags('users')
@@ -36,6 +36,14 @@ export class UsersController {
   ) {
     const user = await this.usersService.updateUser(id, payload);
     return user;
+  }
+
+  @Put(':id/change-password')
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: ChangePasswordDto,
+  ) {
+    return await this.usersService.changePassword(id, payload);
   }
 
   @Delete(':id')
