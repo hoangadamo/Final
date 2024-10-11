@@ -1,7 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { LoginDTO, RegisterDTO, SendOTPDto, VerifyOTPDto } from './dto';
-import { User } from 'src/database';
+import {
+  LoginDTO,
+  RegisterDTO,
+  SendOTPDto,
+  StoreRegisterDTO,
+  VerifyOTPDto,
+} from './dto';
+import { Store, User } from 'src/database';
 import * as bcrypt from 'bcrypt';
 import {
   CommonHelper,
@@ -15,10 +21,14 @@ import { ILoginResponse, IToken } from 'src/interfaces';
 import { emailSender, token } from 'src/configs';
 import moment from 'moment';
 import md5 from 'md5';
+import { StoresRepository } from '../stores';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private storesRepository: StoresRepository,
+  ) {}
 
   async register(payload: RegisterDTO): Promise<User> {
     const { name, phone, email, password } = payload;
@@ -43,12 +53,41 @@ export class AuthService {
       isAdmin: false,
       isVerify: false,
       otp: '0000',
-      otpExpireTime: 10,
+      otpExpireTime: 0,
       rankId: 1,
     });
     const user = newUser.dataValues;
     delete user.password;
     return user;
+  }
+
+  async storeRegister(payload: StoreRegisterDTO): Promise<Store> {
+    const { name, email, password } = payload;
+
+    if (!name || !email || !password) {
+      throw new BadRequestException('missing required fields');
+    }
+
+    const existingStore = await this.storesRepository.findOne({
+      where: [{ email: payload.email }],
+    });
+
+    if (existingStore) {
+      ErrorHelper.BadRequestException('store email already exists');
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    const newStore = await this.storesRepository.create({
+      ...payload,
+      password: hashed,
+      isApproved: false,
+      otp: '0000',
+      otpExpireTime: 0,
+    });
+    const store = newStore.dataValues;
+    delete store.password;
+    return store;
   }
 
   private generateToken(payload: object): IToken {

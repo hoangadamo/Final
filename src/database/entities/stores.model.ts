@@ -54,20 +54,23 @@ export class Store extends Model {
   isApproved: boolean;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
-    validate: {
-      len: [4, 4], // OTP is 4 digits
-    },
   })
-  otp: number;
+  otp: string;
 
   @Column({
     type: DataType.BIGINT,
     allowNull: false,
-    defaultValue: 10 * 60 * 1000, // default: 10 minutes
+    defaultValue: 0,
   })
-  otpExpireTime: number; // miliseconds
+  otpExpireTime: number;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  isVerify: boolean;
 
   @BelongsToMany(() => User, () => UserStore)
   users: User[];
