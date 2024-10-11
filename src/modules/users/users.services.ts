@@ -6,6 +6,7 @@ import { GetListUserDto } from './dto';
 import { UsersRepository } from './users.repository';
 import { User } from 'src/database';
 import { Op } from 'sequelize';
+import { ErrorHelper } from 'src/utils';
 
 @Injectable()
 export class UsersService {
@@ -39,5 +40,13 @@ export class UsersService {
       FIRST_PAGE,
       LIMIT_PAGE,
     );
+  }
+
+  async getUserDetails(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: [{ id }] });
+    if (!user) {
+      ErrorHelper.BadRequestException('user not found');
+    }
+    return user;
   }
 }
