@@ -1,16 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  HttpCode,
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { GetListUserDto } from './dto';
+import { GetListUserDto, UpdateUserDto } from './dto';
 import { UsersService } from './users.services';
 
 @ApiTags('users')
@@ -26,5 +27,19 @@ export class UsersController {
   @Get(':id')
   async getUserDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.getUserDetails(id);
+  }
+
+  @Put(':id')
+  async updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateUserDto,
+  ) {
+    const user = await this.usersService.updateUser(id, payload);
+    return user;
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return await this.usersService.deleteUser(id);
   }
 }
