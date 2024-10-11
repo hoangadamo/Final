@@ -76,4 +76,13 @@ export class StoresService {
     delete store.password;
     return store;
   }
+
+  async deleteStore(id: number): Promise<string> {
+    const user = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!user) {
+      ErrorHelper.BadRequestException('store not found');
+    }
+    await this.storesRepository.delete({ where: [{ id }] });
+    return 'delete successfully';
+  }
 }
