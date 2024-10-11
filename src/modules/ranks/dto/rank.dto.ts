@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateRankDTO {
   @IsNotEmpty()
@@ -30,3 +37,13 @@ export class CreateRankDTO {
   @Min(0, { message: 'maxPercentagePoints must be a non-negative number' })
   maxPercentagePoints: number;
 }
+
+export class GetListRanksDto {
+  @IsOptional()
+  page?: number;
+
+  @IsOptional()
+  limit?: number;
+}
+
+export class UpdateRankDto extends PartialType(CreateRankDTO) {}
