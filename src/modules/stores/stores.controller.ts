@@ -4,11 +4,17 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { GetListStoresDto } from './dto';
+import { StoreGuard } from 'src/utils';
+import { Request } from 'express';
+import { ICustomRequest } from 'src/interfaces';
 
 @Controller('stores')
 export class StoresController {
@@ -31,5 +37,15 @@ export class StoresController {
   @Delete(':id')
   async deleteStore(@Param('id', ParseIntPipe) id: number) {
     return await this.storesService.deleteStore(id);
+  }
+
+  @UseGuards(StoreGuard)
+  @Post('users/:userId')
+  async addUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Req() req: ICustomRequest,
+  ) {
+    const storeId = req.store.id;
+    return await this.storesService.addUser(storeId, userId);
   }
 }

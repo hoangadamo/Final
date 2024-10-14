@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Store } from 'src/database';
+import { Store, UserStore } from 'src/database';
 import { StoresRepository } from './stores.repository';
 import { ErrorHelper } from 'src/utils';
 import { GetListStoresDto } from './dto';
 import { IPaginationRes } from 'src/interfaces';
 import { Op } from 'sequelize';
-import { FIRST_PAGE, LIMIT_PAGE } from 'src/constants';
+import { FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
+import { UsersStoresRepository } from './user-store.repository';
+import { UsersRepository } from '../users';
 
 @Injectable()
 export class StoresService {
-  constructor(private storesRepository: StoresRepository) {}
+  constructor(
+    private storesRepository: StoresRepository,
+    private usersRepository: UsersRepository,
+    private usersStoresRepository: UsersStoresRepository,
+  ) {}
 
   async approve(id: number): Promise<Store> {
     const store = await this.storesRepository.findOne({ where: [{ id }] });
@@ -84,5 +90,32 @@ export class StoresService {
     }
     await this.storesRepository.delete({ where: [{ id }] });
     return 'delete successfully';
+  }
+
+  async addUser(id: number, userId: number): Promise<UserStore> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId: id, userId: userId }],
+    });
+    if (userStore) {
+      ErrorHelper.BadRequestException('user has been added to the store');
+    }
+    const newUserStore = await this.usersStoresRepository.create({
+      storeId: id,
+      userId: userId,
+    });
+    return newUserStore;
   }
 }
