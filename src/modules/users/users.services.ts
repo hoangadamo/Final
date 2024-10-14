@@ -25,7 +25,7 @@ export class UsersService {
 
     // search by name
     if (name) {
-      filters.name = { [Op.like]: `%${name}%` };
+      filters.name = { [Op.iLike]: `%${name}%` };
     }
 
     const options = {

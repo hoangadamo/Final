@@ -57,4 +57,11 @@ export class StoresController {
     const storeId = req.store.id;
     return await this.storesService.removeUser(storeId, userId);
   }
+
+  @UseGuards(StoreGuard)
+  @Get('users/list')
+  async getListStoreUsers(@Req() req: ICustomRequest) {
+    const storeId = req.store.id;
+    return await this.storesService.getListStoreUsers(storeId);
+  }
 }

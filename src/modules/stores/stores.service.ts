@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Store, UserStore } from 'src/database';
+import { Store, User, UserStore } from 'src/database';
 import { StoresRepository } from './stores.repository';
 import { ErrorHelper } from 'src/utils';
 import { GetListStoresDto } from './dto';
@@ -55,7 +55,7 @@ export class StoresService {
 
     // search by name
     if (name) {
-      filters.name = { [Op.like]: `%${name}%` };
+      filters.name = { [Op.iLike]: `%${name}%` };
     }
 
     const options = {
@@ -144,5 +144,23 @@ export class StoresService {
     await this.usersStoresRepository.delete({ where: [{ id: userStore.id }] });
 
     return 'successfully remove user from the store';
+  }
+
+  async getListStoreUsers(id: number): Promise<User[]> {
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+
+    const userStores = await this.usersStoresRepository.find({
+      where: [{ storeId: id }],
+    });
+    const userIds = userStores.map((userStore) => userStore.userId);
+    return await this.usersRepository.find({
+      where: [{ id: userIds }],
+      attributes: { exclude: ['password'] },
+    });
   }
 }
