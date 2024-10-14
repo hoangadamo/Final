@@ -24,7 +24,7 @@ export class StoresController {
   }
 
   @Get(':id')
-  async getUserDetails(@Param('id', ParseIntPipe) id: number) {
+  async getStoreDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.storesService.getStoreDetails(id);
   }
 
