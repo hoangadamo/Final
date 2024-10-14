@@ -16,8 +16,8 @@ import {
   TokenHelper,
 } from 'src/utils';
 import { UsersRepository } from '../users';
-import { APPLICATION, OTP, USER } from 'src/constants';
-import { ILoginResponse, IToken } from 'src/interfaces';
+import { APPLICATION, OTP, STORE, USER } from 'src/constants';
+import { ILoginResponse, IStoreLoginResponse, IToken } from 'src/interfaces';
 import { emailSender, token } from 'src/configs';
 import moment from 'moment';
 import md5 from 'md5';
@@ -34,7 +34,7 @@ export class AuthService {
     const { name, phone, email, password } = payload;
 
     if (!name || !phone || !email || !password) {
-      throw new BadRequestException('Missing required fields');
+      throw new BadRequestException('missing required fields');
     }
 
     const existingUser = await this.usersRepository.findOne({
@@ -118,18 +118,46 @@ export class AuthService {
     }
 
     if (!user.isVerify) {
-      ErrorHelper.BadRequestException('user is not verified');
+      ErrorHelper.BadRequestException(USER.USER_NOT_VERIFIED);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword)
       ErrorHelper.BadRequestException(USER.INVALID_PASSWORD);
 
-    const token = this.generateToken({ id: user.id });
+    const token = this.generateToken({ id: user.id, isAdmin: user.isAdmin });
     delete user.password;
     return {
       ...token,
       user,
+    };
+  }
+
+  async storeLogin(body: LoginDTO): Promise<IStoreLoginResponse> {
+    const { password, email } = body;
+    const store = await this.storesRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!store) {
+      ErrorHelper.BadRequestException(STORE.STORE_NOT_FOUND);
+    }
+
+    if (!store.isVerify) {
+      ErrorHelper.BadRequestException(STORE.STORE_NOT_VERIFIED);
+    }
+
+    const isValidPassword = await bcrypt.compare(password, store.password);
+    if (!isValidPassword)
+      ErrorHelper.BadRequestException(STORE.INVALID_PASSWORD);
+
+    const token = this.generateToken({ id: store.id });
+    delete store.password;
+    return {
+      ...token,
+      store,
     };
   }
 
