@@ -16,8 +16,8 @@ import {
   TokenHelper,
 } from 'src/utils';
 import { UsersRepository } from '../users';
-import { APPLICATION, OTP, USER } from 'src/constants';
-import { ILoginResponse, IToken } from 'src/interfaces';
+import { APPLICATION, OTP, STORE, USER } from 'src/constants';
+import { ILoginResponse, IStoreLoginResponse, IToken } from 'src/interfaces';
 import { emailSender, token } from 'src/configs';
 import moment from 'moment';
 import md5 from 'md5';
@@ -125,11 +125,39 @@ export class AuthService {
     if (!isValidPassword)
       ErrorHelper.BadRequestException(USER.INVALID_PASSWORD);
 
-    const token = this.generateToken({ id: user.id });
+    const token = this.generateToken({ id: user.id, isAdmin: user.isAdmin });
     delete user.password;
     return {
       ...token,
       user,
+    };
+  }
+
+  async storeLogin(body: LoginDTO): Promise<IStoreLoginResponse> {
+    const { password, email } = body;
+    const store = await this.storesRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!store) {
+      ErrorHelper.BadRequestException(STORE.STORE_NOT_FOUND);
+    }
+
+    if (!store.isVerify) {
+      ErrorHelper.BadRequestException('store is not verified');
+    }
+
+    const isValidPassword = await bcrypt.compare(password, store.password);
+    if (!isValidPassword)
+      ErrorHelper.BadRequestException(STORE.INVALID_PASSWORD);
+
+    const token = this.generateToken({ id: store.id });
+    delete store.password;
+    return {
+      ...token,
+      store,
     };
   }
 

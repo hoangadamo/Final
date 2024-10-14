@@ -60,4 +60,10 @@ export class AuthController {
       hash: result,
     };
   }
+
+  @Post('/store-login')
+  @HttpCode(200)
+  async storeLogin(@Body() payload: LoginDTO) {
+    return this.authService.storeLogin(payload);
+  }
 }
