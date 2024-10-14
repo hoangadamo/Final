@@ -34,7 +34,7 @@ export class AuthService {
     const { name, phone, email, password } = payload;
 
     if (!name || !phone || !email || !password) {
-      throw new BadRequestException('Missing required fields');
+      throw new BadRequestException('missing required fields');
     }
 
     const existingUser = await this.usersRepository.findOne({
@@ -118,7 +118,7 @@ export class AuthService {
     }
 
     if (!user.isVerify) {
-      ErrorHelper.BadRequestException('user is not verified');
+      ErrorHelper.BadRequestException(USER.USER_NOT_VERIFIED);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -146,7 +146,7 @@ export class AuthService {
     }
 
     if (!store.isVerify) {
-      ErrorHelper.BadRequestException('store is not verified');
+      ErrorHelper.BadRequestException(STORE.STORE_NOT_VERIFIED);
     }
 
     const isValidPassword = await bcrypt.compare(password, store.password);
