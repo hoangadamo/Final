@@ -17,7 +17,8 @@ export class CreateRewardDto {
   name: string;
 
   @IsNotEmpty()
-  @IsInt()
+  @Type(() => Number)
+  @IsNumber()
   @Min(0, { message: 'pointsRequired must be a non-negative number' })
   pointsRequired: number;
 
@@ -28,6 +29,7 @@ export class CreateRewardDto {
   expirationDate: Date;
 
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
   @Min(0, { message: 'quantity must be a non-negative number' })
   quantity: number;
