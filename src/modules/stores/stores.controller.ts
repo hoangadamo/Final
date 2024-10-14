@@ -13,7 +13,6 @@ import {
 import { StoresService } from './stores.service';
 import { GetListStoresDto } from './dto';
 import { StoreGuard } from 'src/utils';
-import { Request } from 'express';
 import { ICustomRequest } from 'src/interfaces';
 
 @Controller('stores')
@@ -47,5 +46,15 @@ export class StoresController {
   ) {
     const storeId = req.store.id;
     return await this.storesService.addUser(storeId, userId);
+  }
+
+  @UseGuards(StoreGuard)
+  @Delete('users/:userId')
+  async removeUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Req() req: ICustomRequest,
+  ) {
+    const storeId = req.store.id;
+    return await this.storesService.removeUser(storeId, userId);
   }
 }

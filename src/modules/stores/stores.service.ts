@@ -118,4 +118,31 @@ export class StoresService {
     });
     return newUserStore;
   }
+
+  async removeUser(id: number, userId: number): Promise<string> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId: id, userId: userId }],
+    });
+    if (!userStore) {
+      ErrorHelper.BadRequestException('user has not been added to the store');
+    }
+
+    await this.usersStoresRepository.delete({ where: [{ id: userStore.id }] });
+
+    return 'successfully remove user from the store';
+  }
 }
