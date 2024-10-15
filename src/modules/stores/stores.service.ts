@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Store, User, UserStore } from 'src/database';
+import { Store, Transaction, User, UserStore } from 'src/database';
 import { ErrorHelper } from 'src/utils';
-import { ChangePasswordDto, GetListStoresDto, UpdateStoreDto } from './dto';
+import {
+  ChangePasswordDto,
+  CreateTransactionDto,
+  GetListStoresDto,
+  UpdateStoreDto,
+} from './dto';
 import { IPaginationRes } from 'src/interfaces';
 import { Op } from 'sequelize';
-import { FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
+import { EPointType, FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
 import { UsersRepository } from '../users';
 import {
   StoresRepository,
@@ -229,22 +234,12 @@ export class StoresService {
   }
 
   async AddPoints(
-    storeId: number,
     userId: number,
     point: number,
   ): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: [{ id: userId }],
     });
-    if (!user) {
-      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
-    }
-    const userStore = await this.usersStoresRepository.findOne({
-      where: [{ storeId, userId }],
-    });
-    if (!userStore) {
-      ErrorHelper.BadRequestException('user has not been added to the store');
-    }
 
     const newPoints = user.points + point;
 
@@ -266,5 +261,51 @@ export class StoresService {
         break;
       }
     }
+  }
+
+  async createTransaction(
+    storeId: number,
+    userId: number,
+    payload: CreateTransactionDto,
+  ): Promise<Transaction> {
+    const { amount, pointType } = payload;
+
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId, userId }],
+    });
+    if (!userStore) {
+      ErrorHelper.BadRequestException('user has not been added to the store');
+    }
+
+    const rank = await this.ranksRepository.findOne({
+      where: [{ id: user.rankId }],
+    });
+
+    let point = 0;
+
+    if (pointType === EPointType.FIX) {
+      point = Math.floor(amount / rank.amount) * rank.fixedPoint;
+    } else {
+      point = Math.min(
+        Math.floor((amount / 1000) * rank.percentage),
+        rank.maxPercentagePoints,
+      );
+    }
+
+    await this.AddPoints(userId, point);
+    return await this.transactionsRepository.create({
+      ...payload,
+      userId,
+      storeId,
+      pointsEarned: point,
+      transactionDate: new Date(),
+    });
   }
 }

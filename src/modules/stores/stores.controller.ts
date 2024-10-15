@@ -12,7 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StoresService } from './stores.service';
-import { ChangePasswordDto, GetListStoresDto, UpdateStoreDto } from './dto';
+import {
+  ChangePasswordDto,
+  CreateTransactionDto,
+  GetListStoresDto,
+  UpdateStoreDto,
+} from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
 
@@ -83,15 +88,26 @@ export class StoresController {
     return await this.storesService.getListStoreUsers(storeId);
   }
 
+  // @UseGuards(StoreGuard)
+  // @Post('users/:userId/points')
+  // async addPoints(
+  //   @Param('userId', ParseIntPipe) userId: number,
+  //   @Req() req: ICustomRequest,
+  //   @Body('point') point: number,
+  // ) {
+  //   const storeId = req.store.id;
+  //   await this.storesService.AddPoints(storeId, userId, point);
+  //   return 'add points successfully';
+  // }
+
   @UseGuards(StoreGuard)
   @Post('users/:userId/points')
   async addPoints(
     @Param('userId', ParseIntPipe) userId: number,
     @Req() req: ICustomRequest,
-    @Body('point') point: number,
+    @Body() payload: CreateTransactionDto,
   ) {
     const storeId = req.store.id;
-    await this.storesService.AddPoints(storeId, userId, point);
-    return 'add points successfully';
+    return await this.storesService.createTransaction(storeId, userId, payload);
   }
 }
