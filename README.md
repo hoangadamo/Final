@@ -18,7 +18,7 @@
     - Tích điểm cố định (Ví dụ: 100k tích 5 điểm, 200k tích 10 điểm)
     - Tích điểm theo phần trăm giá trị đơn hàng
 + Số điểm tích của user sẽ được chia thành các cấp bậc rank(mặc định khi đăng ký sẽ là rank đồng)
-    - Rank đồng(default): Cứ mỗi 100k được tích 5 điểm hoặc được tích 10% tối đa 5 điểm 
-    - Rank bạc (khi tích được 2000 điểm sẽ lên rank): Cứ mỗi 100k được tích 10 điểm hoặc tích 15% tối đa 10 điểm 
-    - Rank vàng (khi tích được 5000 điểm sẽ lên rank): Cứ mỗi 100k được tích 15 điểm hoặc được tích 20% tối đa 20 điểm
+    - Rank đồng(default): Cứ mỗi 100k được tích 5 điểm hoặc được tích 10% tối đa 50 điểm 
+    - Rank bạc (khi tích được 2000 điểm sẽ lên rank): Cứ mỗi 100k được tích 10 điểm hoặc tích 15% tối đa 100 điểm 
+    - Rank vàng (khi tích được 5000 điểm sẽ lên rank): Cứ mỗi 100k được tích 15 điểm hoặc được tích 20% tối đa 200 điểm
 + Đổi sản phẩm (mỗi lần user chỉ được đổi tối đa 3 item, và số điểm tối đa có thể đổ là 1000 điểm/lần)
