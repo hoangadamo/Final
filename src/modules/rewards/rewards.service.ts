@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRewardDto, GetListRewardsDto, UpdateRewardDto } from './dto';
-import { Reward } from 'src/database';
+import { Reward, Store } from 'src/database';
 import { RewardsRepository } from './rewards.repository';
 import { StoresRepository } from '../stores';
 import { ErrorHelper } from 'src/utils';
@@ -79,7 +79,12 @@ export class RewardsService {
   }
 
   async getRewardDetails(id: number): Promise<Reward> {
-    const reward = await this.rewardsRepository.findOne({ where: [{ id }] });
+    const reward = await this.rewardsRepository.findOne({
+      where: { id },
+      include: { model: Store, attributes: ['email', 'name'] },
+      raw: true,
+      nest: true,
+    });
     if (!reward) {
       ErrorHelper.BadRequestException('reward not found');
     }
