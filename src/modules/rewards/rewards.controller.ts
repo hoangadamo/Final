@@ -32,7 +32,6 @@ export class RewardsController {
     @Req() req: ICustomRequest,
   ) {
     const storeId = req.store.id;
-    console.log(file);
     const imageUrl = file ? `/uploads/${file.filename}` : null;
     return await this.rewardsService.createReward(storeId, payload, imageUrl);
   }
@@ -48,7 +47,7 @@ export class RewardsController {
   }
 
   @Put(':id')
-  async updateUser(
+  async updateReward(
     @Param('id', ParseIntPipe) id: number,
     @Body() payload: UpdateRewardDto,
   ) {
@@ -56,8 +55,22 @@ export class RewardsController {
     return user;
   }
 
+  @UseGuards(StoreGuard)
+  @Put(':id/change-image')
+  @UseInterceptors(FileInterceptor('image'))
+  async changeImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: ICustomRequest,
+  ) {
+    const storeId = req.store.id;
+    const imageUrl = file ? `/uploads/${file.filename}` : null;
+    const user = await this.rewardsService.changeImage(storeId, id, imageUrl);
+    return user;
+  }
+
   @Delete(':id')
-  async deleteUser(@Param('id', ParseIntPipe) id: number) {
+  async deleteReward(@Param('id', ParseIntPipe) id: number) {
     return await this.rewardsService.deleteReward(id);
   }
 }

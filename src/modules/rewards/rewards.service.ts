@@ -20,14 +20,14 @@ export class RewardsService {
     imageUrl: string,
   ): Promise<Reward> {
     const store = await this.storesRepository.findOne({
-      where: [{ id }],
+      where: { id },
     });
     if (!store) {
       ErrorHelper.NotFoundException('store not found');
     }
     const { name } = payload;
     const reward = await this.rewardsRepository.findOne({
-      where: [{ name }],
+      where: { name, storeId: id },
     });
     if (reward) {
       ErrorHelper.BadRequestException('reward already exist in the store');
@@ -44,13 +44,18 @@ export class RewardsService {
   async getListRewards(
     payload: GetListRewardsDto,
   ): Promise<IPaginationRes<Reward>> {
-    const { page, limit, name, sort } = payload;
+    const { page, limit, name, sort, storeId } = payload;
 
     const filters: any = {};
 
     // search by name
     if (name) {
       filters.name = { [Op.iLike]: `%${name}%` };
+    }
+
+    // filter by storeId
+    if (storeId) {
+      filters.storeId = storeId;
     }
 
     const options: any = {
@@ -99,6 +104,23 @@ export class RewardsService {
     return await this.rewardsRepository.findOne({
       where: [{ id }],
     });
+  }
+
+  async changeImage(
+    storeId: number,
+    id: number,
+    imageUrl: string,
+  ): Promise<Reward> {
+    const reward = await this.rewardsRepository.findOne({
+      where: { id, storeId },
+    });
+    if (!reward) {
+      ErrorHelper.BadRequestException('reward not found in this store');
+    }
+    if (imageUrl !== null) {
+      await this.rewardsRepository.update({ imageUrl }, { where: { id } });
+    }
+    return await this.rewardsRepository.findOne({ where: { id } });
   }
 
   async deleteReward(id: number): Promise<string> {

@@ -51,6 +51,9 @@ export class GetListRewardsDto {
 
   @IsOptional()
   sort?: 'ASC' | 'DESC';
+
+  @IsOptional()
+  storeId?: number;
 }
 
 export class UpdateRewardDto extends PartialType(CreateRewardDto) {}
