@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StoresService } from './stores.service';
-import { GetListStoresDto, UpdateStoreDto } from './dto';
+import { ChangePasswordDto, GetListStoresDto, UpdateStoreDto } from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
 
@@ -31,6 +31,14 @@ export class StoresController {
   @Put(':id/approve')
   async approve(@Param('id') id: number) {
     return this.storesService.approve(id);
+  }
+
+  @Put(':id/change-password')
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: ChangePasswordDto,
+  ) {
+    return await this.storesService.changePassword(id, payload);
   }
 
   @Get()

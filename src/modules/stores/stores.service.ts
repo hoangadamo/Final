@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Store, User, UserStore } from 'src/database';
 import { ErrorHelper } from 'src/utils';
-import { GetListStoresDto, UpdateStoreDto } from './dto';
+import { ChangePasswordDto, GetListStoresDto, UpdateStoreDto } from './dto';
 import { IPaginationRes } from 'src/interfaces';
 import { Op } from 'sequelize';
 import { FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
@@ -11,6 +11,7 @@ import {
   TransactionsRepository,
   UsersStoresRepository,
 } from './repositories';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StoresService {
@@ -183,5 +184,45 @@ export class StoresService {
       where: [{ id }],
       attributes: { exclude: ['password'] },
     });
+  }
+
+  async changePassword(
+    id: number,
+    payload: ChangePasswordDto,
+  ): Promise<string> {
+    const store = await this.storesRepository.findOne({ where: { id } });
+    if (!store) {
+      throw new ErrorHelper.BadRequestException('store not found');
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = payload;
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      store.password,
+    );
+    if (!isValidPassword) {
+      ErrorHelper.BadRequestException('current password is incorrect');
+    }
+
+    if (newPassword !== confirmPassword) {
+      ErrorHelper.BadRequestException(
+        'new password and confirmation password do not match',
+      );
+    }
+
+    if (currentPassword === newPassword) {
+      ErrorHelper.BadRequestException(
+        'new password must be different from the current password',
+      );
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await this.storesRepository.update(
+      { password: hashed },
+      { where: [{ id }] },
+    );
+
+    return 'update password successful';
   }
 }
