@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -11,14 +12,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StoresService } from './stores.service';
-import { GetListStoresDto } from './dto';
+import { GetListStoresDto, UpdateStoreDto } from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
 
 @Controller('stores')
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
+
   @Put(':id')
+  async updateStore(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateStoreDto,
+  ) {
+    return await this.storesService.updateStore(id, payload);
+  }
+
+  @Put(':id/approve')
   async approve(@Param('id') id: number) {
     return this.storesService.approve(id);
   }

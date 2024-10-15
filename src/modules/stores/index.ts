@@ -1,4 +1,4 @@
 export * from './stores.module';
 export * from './stores.service';
-export * from './stores.repository';
-export * from './user-store.repository';
+export * from './repositories/stores.repository';
+export * from './repositories/user-store.repository';

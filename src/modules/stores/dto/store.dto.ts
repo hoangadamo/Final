@@ -1,4 +1,5 @@
-import { IsOptional } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class GetListStoresDto {
   @IsOptional()
@@ -15,4 +16,14 @@ export class GetListStoresDto {
 
   @IsOptional()
   isApproved?: boolean;
+}
+
+export class UpdateStoreDto {
+  @IsOptional()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsEmail()
+  email: string;
 }

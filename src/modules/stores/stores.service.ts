@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Store, User, UserStore } from 'src/database';
-import { StoresRepository } from './stores.repository';
 import { ErrorHelper } from 'src/utils';
-import { GetListStoresDto } from './dto';
+import { GetListStoresDto, UpdateStoreDto } from './dto';
 import { IPaginationRes } from 'src/interfaces';
 import { Op } from 'sequelize';
 import { FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
-import { UsersStoresRepository } from './user-store.repository';
 import { UsersRepository } from '../users';
+import {
+  StoresRepository,
+  TransactionsRepository,
+  UsersStoresRepository,
+} from './repositories';
 
 @Injectable()
 export class StoresService {
@@ -15,6 +18,7 @@ export class StoresService {
     private storesRepository: StoresRepository,
     private usersRepository: UsersRepository,
     private usersStoresRepository: UsersStoresRepository,
+    private transactionsRepository: TransactionsRepository,
   ) {}
 
   async approve(id: number): Promise<Store> {
@@ -160,6 +164,23 @@ export class StoresService {
     const userIds = userStores.map((userStore) => userStore.userId);
     return await this.usersRepository.find({
       where: [{ id: userIds }],
+      attributes: { exclude: ['password'] },
+    });
+  }
+
+  async updateStore(id: number, payload: UpdateStoreDto): Promise<Store> {
+    const user = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!user) {
+      ErrorHelper.BadRequestException('user not found');
+    }
+
+    const { name, email } = payload;
+    const data: Partial<UpdateStoreDto> = {};
+    if (name) data.name = name;
+    if (email) data.email = email;
+    await this.storesRepository.update(data, { where: [{ id }] });
+    return await this.storesRepository.findOne({
+      where: [{ id }],
       attributes: { exclude: ['password'] },
     });
   }
