@@ -44,6 +44,9 @@ export class GetListRanksDto {
 
   @IsOptional()
   limit?: number;
+
+  @IsOptional()
+  sort?: 'ASC' | 'DESC';
 }
 
 export class UpdateRankDto extends PartialType(CreateRankDTO) {}

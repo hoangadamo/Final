@@ -24,11 +24,18 @@ export class RanksService {
   }
 
   async getListRanks(payload: GetListRanksDto): Promise<IPaginationRes<Rank>> {
-    const { page, limit } = payload;
-    if (page && limit) {
-      return await this.ranksRepository.paginate({}, page, limit);
+    const { page, limit, sort } = payload;
+
+    const options: any = {};
+
+    if (sort) {
+      options.order = [['pointsThreshold', sort]];
     }
-    return await this.ranksRepository.paginate({}, FIRST_PAGE, LIMIT_PAGE);
+
+    if (page && limit) {
+      return await this.ranksRepository.paginate(options, page, limit);
+    }
+    return await this.ranksRepository.paginate(options, FIRST_PAGE, LIMIT_PAGE);
   }
 
   async getRankDetails(id: number): Promise<Rank> {
