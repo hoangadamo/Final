@@ -89,8 +89,8 @@ export class StoresService {
   }
 
   async deleteStore(id: number): Promise<string> {
-    const user = await this.storesRepository.findOne({ where: [{ id }] });
-    if (!user) {
+    const store = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!store) {
       ErrorHelper.BadRequestException('store not found');
     }
     await this.storesRepository.delete({ where: [{ id }] });
@@ -170,9 +170,9 @@ export class StoresService {
   }
 
   async updateStore(id: number, payload: UpdateStoreDto): Promise<Store> {
-    const user = await this.storesRepository.findOne({ where: [{ id }] });
-    if (!user) {
-      ErrorHelper.BadRequestException('user not found');
+    const store = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!store) {
+      ErrorHelper.BadRequestException('store not found');
     }
 
     const { name, email } = payload;
@@ -225,4 +225,5 @@ export class StoresService {
 
     return 'update password successful';
   }
+
 }
