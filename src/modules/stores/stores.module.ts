@@ -5,12 +5,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Store } from 'src/database/entities/stores.model';
 import { StoresRepository } from './repositories/stores.repository';
 import { UsersRepository } from '../users';
-import { Transaction, User, UserStore } from 'src/database';
+import { Rank, Transaction, User, UserStore } from 'src/database';
 import { UsersStoresRepository } from './repositories/user-store.repository';
 import { TransactionsRepository } from './repositories';
+import { RanksRepository } from '../ranks';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Store, User, UserStore, Transaction])],
+  imports: [
+    SequelizeModule.forFeature([Store, User, UserStore, Transaction, Rank]),
+  ],
   controllers: [StoresController],
   providers: [
     StoresService,
@@ -18,6 +21,7 @@ import { TransactionsRepository } from './repositories';
     UsersRepository,
     UsersStoresRepository,
     TransactionsRepository,
+    RanksRepository,
   ],
 })
 export class StoresModule {}

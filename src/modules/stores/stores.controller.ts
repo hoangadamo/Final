@@ -82,4 +82,16 @@ export class StoresController {
     const storeId = req.store.id;
     return await this.storesService.getListStoreUsers(storeId);
   }
+
+  @UseGuards(StoreGuard)
+  @Post('users/:userId/points')
+  async addPoints(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Req() req: ICustomRequest,
+    @Body('point') point: number,
+  ) {
+    const storeId = req.store.id;
+    await this.storesService.AddPoints(storeId, userId, point);
+    return 'add points successfully';
+  }
 }

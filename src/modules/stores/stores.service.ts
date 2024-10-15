@@ -12,6 +12,7 @@ import {
   UsersStoresRepository,
 } from './repositories';
 import * as bcrypt from 'bcrypt';
+import { RanksRepository } from '../ranks';
 
 @Injectable()
 export class StoresService {
@@ -20,6 +21,7 @@ export class StoresService {
     private usersRepository: UsersRepository,
     private usersStoresRepository: UsersStoresRepository,
     private transactionsRepository: TransactionsRepository,
+    private ranksRepository: RanksRepository,
   ) {}
 
   async approve(id: number): Promise<Store> {
@@ -226,4 +228,43 @@ export class StoresService {
     return 'update password successful';
   }
 
+  async AddPoints(
+    storeId: number,
+    userId: number,
+    point: number,
+  ): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId, userId }],
+    });
+    if (!userStore) {
+      ErrorHelper.BadRequestException('user has not been added to the store');
+    }
+
+    const newPoints = user.points + point;
+
+    await this.usersRepository.update(
+      { points: newPoints },
+      { where: [{ id: userId }] },
+    );
+
+    // update rank_id if needed:
+    const ranks = await this.ranksRepository.find({
+      order: [['pointsThreshold', 'DESC']],
+    });
+    for (const rank of ranks) {
+      if (newPoints >= rank.pointsThreshold) {
+        await this.usersRepository.update(
+          { rankId: rank.id },
+          { where: [{ id: userId }] },
+        );
+        break;
+      }
+    }
+  }
 }
