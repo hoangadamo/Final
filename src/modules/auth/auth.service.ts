@@ -178,6 +178,10 @@ export class AuthService {
       ErrorHelper.BadRequestException(STORE.STORE_NOT_VERIFIED);
     }
 
+    if (!store.isApproved) {
+      ErrorHelper.BadRequestException(STORE.STORE_NOT_APPROVED);
+    }
+
     const isValidPassword = await bcrypt.compare(password, store.password);
     if (!isValidPassword)
       ErrorHelper.BadRequestException(STORE.INVALID_PASSWORD);
