@@ -5,10 +5,33 @@ import { ErrorHelper } from 'src/utils';
 import { Rank } from 'src/database';
 import { IPaginationRes } from 'src/interfaces';
 import { FIRST_PAGE, LIMIT_PAGE } from 'src/constants';
+import { UsersRepository } from '../users';
 
 @Injectable()
 export class RanksService {
-  constructor(private ranksRepository: RanksRepository) {}
+  constructor(
+    private ranksRepository: RanksRepository,
+    private usersRepository: UsersRepository,
+  ) {}
+
+  async updateUserRank(): Promise<void> {
+    const ranks = await this.ranksRepository.find({
+      order: [['pointsThreshold', 'DESC']],
+    });
+
+    const users = await this.usersRepository.find();
+    for (const user of users) {
+      for (const rank of ranks) {
+        if (user.points >= rank.pointsThreshold) {
+          await this.usersRepository.update(
+            { rankId: rank.id },
+            { where: { id: user.id } },
+          );
+          break;
+        }
+      }
+    }
+  }
 
   async createRank(payload: CreateRankDTO): Promise<Rank> {
     const { name } = payload;
@@ -18,6 +41,9 @@ export class RanksService {
     if (existingRank) {
       ErrorHelper.BadRequestException('rank already exists');
     }
+    // update user rank_id if needed
+    await this.updateUserRank();
+
     return await this.ranksRepository.create({
       ...payload,
     });
@@ -70,6 +96,8 @@ export class RanksService {
     if (maxPercentagePoints) data.maxPercentagePoints = maxPercentagePoints;
 
     await this.ranksRepository.update(data, { where: [{ id }] });
+    // update user rank_id if needed
+    await this.updateUserRank();
     return await this.ranksRepository.findOne({ where: [{ id }] });
   }
 
@@ -79,6 +107,8 @@ export class RanksService {
       ErrorHelper.BadRequestException('rank not found');
     }
     await this.ranksRepository.delete({ where: [{ id }] });
+    // update user rank_id if needed
+    await this.updateUserRank();
     return 'delete successfully';
   }
 }
