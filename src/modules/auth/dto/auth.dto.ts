@@ -58,3 +58,14 @@ export class StoreRegisterDTO {
   )
   password: string;
 }
+
+export class UserLoginDTO {
+  @IsNotEmpty()
+  phone: string;
+
+  @IsNotEmpty()
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, // minlength: 8, atleast 1 lowercase, 1 uppercase, 1 number, 1 special character
+  )
+  password: string;
+}
