@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -28,5 +30,10 @@ export class RedemptionsController {
   @Get()
   async getListRedemptions(@Query() payload: GetListRedemptionsDto) {
     return await this.redemptionsService.getListRedemptions(payload);
+  }
+
+  @Get(':id')
+  async getRedemptionDetails(@Param('id', ParseIntPipe) id: number) {
+    return await this.redemptionsService.getRedemptionDetails(id);
   }
 }

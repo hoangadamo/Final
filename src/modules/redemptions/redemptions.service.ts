@@ -118,4 +118,14 @@ export class RedemptionsService {
       LIMIT_PAGE,
     );
   }
+
+  async getRedemptionDetails(id: number): Promise<Redemption> {
+    const redemption = await this.redemptionsRepository.findOne({
+      where: { id },
+    });
+    if (!redemption) {
+      ErrorHelper.BadRequestException('redemption not found');
+    }
+    return redemption;
+  }
 }
