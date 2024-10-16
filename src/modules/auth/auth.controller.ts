@@ -13,6 +13,7 @@ import {
   RegisterDTO,
   SendOTPDto,
   StoreRegisterDTO,
+  UserLoginDTO,
   VerifyOTPDto,
 } from './dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
@@ -65,5 +66,11 @@ export class AuthController {
   @HttpCode(200)
   async storeLogin(@Body() payload: LoginDTO) {
     return this.authService.storeLogin(payload);
+  }
+
+  @Post('/user-login')
+  @HttpCode(200)
+  async userLogin(@Body() payload: UserLoginDTO) {
+    return this.authService.userLogin(payload);
   }
 }

@@ -1,15 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { Store } from 'src/database';
-import { StoresRepository } from './stores.repository';
+import { Store, Transaction, User, UserStore } from 'src/database';
 import { ErrorHelper } from 'src/utils';
-import { GetListStoresDto } from './dto';
+import {
+  ChangePasswordDto,
+  CreateTransactionDto,
+  GetListStoresDto,
+  UpdateStoreDto,
+} from './dto';
 import { IPaginationRes } from 'src/interfaces';
 import { Op } from 'sequelize';
-import { FIRST_PAGE, LIMIT_PAGE } from 'src/constants';
+import { EPointType, FIRST_PAGE, LIMIT_PAGE, STORE, USER } from 'src/constants';
+import { UsersRepository } from '../users';
+import {
+  StoresRepository,
+  TransactionsRepository,
+  UsersStoresRepository,
+} from './repositories';
+import * as bcrypt from 'bcrypt';
+import { RanksRepository } from '../ranks';
 
 @Injectable()
 export class StoresService {
-  constructor(private storesRepository: StoresRepository) {}
+  constructor(
+    private storesRepository: StoresRepository,
+    private usersRepository: UsersRepository,
+    private usersStoresRepository: UsersStoresRepository,
+    private transactionsRepository: TransactionsRepository,
+    private ranksRepository: RanksRepository,
+  ) {}
 
   async approve(id: number): Promise<Store> {
     const store = await this.storesRepository.findOne({ where: [{ id }] });
@@ -49,7 +67,7 @@ export class StoresService {
 
     // search by name
     if (name) {
-      filters.name = { [Op.like]: `%${name}%` };
+      filters.name = { [Op.iLike]: `%${name}%` };
     }
 
     const options = {
@@ -78,11 +96,216 @@ export class StoresService {
   }
 
   async deleteStore(id: number): Promise<string> {
-    const user = await this.storesRepository.findOne({ where: [{ id }] });
-    if (!user) {
+    const store = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!store) {
       ErrorHelper.BadRequestException('store not found');
     }
     await this.storesRepository.delete({ where: [{ id }] });
     return 'delete successfully';
+  }
+
+  async addUser(id: number, userId: number): Promise<UserStore> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId: id, userId: userId }],
+    });
+    if (userStore) {
+      ErrorHelper.BadRequestException('user has been added to the store');
+    }
+    const newUserStore = await this.usersStoresRepository.create({
+      storeId: id,
+      userId: userId,
+    });
+    return newUserStore;
+  }
+
+  async removeUser(id: number, userId: number): Promise<string> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId: id, userId: userId }],
+    });
+    if (!userStore) {
+      ErrorHelper.BadRequestException('user has not been added to the store');
+    }
+
+    await this.usersStoresRepository.delete({ where: [{ id: userStore.id }] });
+
+    return 'successfully remove user from the store';
+  }
+
+  async getListStoreUsers(id: number): Promise<User[]> {
+    const store = await this.storesRepository.findOne({
+      where: [{ id }],
+    });
+    if (!store) {
+      ErrorHelper.NotFoundException(STORE.STORE_NOT_FOUND);
+    }
+
+    const userStores = await this.usersStoresRepository.find({
+      where: [{ storeId: id }],
+    });
+    const userIds = userStores.map((userStore) => userStore.userId);
+    return await this.usersRepository.find({
+      where: [{ id: userIds }],
+      attributes: { exclude: ['password'] },
+    });
+  }
+
+  async updateStore(id: number, payload: UpdateStoreDto): Promise<Store> {
+    const store = await this.storesRepository.findOne({ where: [{ id }] });
+    if (!store) {
+      ErrorHelper.BadRequestException('store not found');
+    }
+
+    const { name, email } = payload;
+    const data: Partial<UpdateStoreDto> = {};
+    if (name) data.name = name;
+    if (email) data.email = email;
+    await this.storesRepository.update(data, { where: [{ id }] });
+    return await this.storesRepository.findOne({
+      where: [{ id }],
+      attributes: { exclude: ['password'] },
+    });
+  }
+
+  async changePassword(
+    id: number,
+    payload: ChangePasswordDto,
+  ): Promise<string> {
+    const store = await this.storesRepository.findOne({ where: { id } });
+    if (!store) {
+      throw new ErrorHelper.BadRequestException('store not found');
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = payload;
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      store.password,
+    );
+    if (!isValidPassword) {
+      ErrorHelper.BadRequestException('current password is incorrect');
+    }
+
+    if (newPassword !== confirmPassword) {
+      ErrorHelper.BadRequestException(
+        'new password and confirmation password do not match',
+      );
+    }
+
+    if (currentPassword === newPassword) {
+      ErrorHelper.BadRequestException(
+        'new password must be different from the current password',
+      );
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await this.storesRepository.update(
+      { password: hashed },
+      { where: [{ id }] },
+    );
+
+    return 'update password successful';
+  }
+
+  async AddPoints(
+    userId: number,
+    point: number,
+  ): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+
+    const newPoints = user.points + point;
+
+    await this.usersRepository.update(
+      { points: newPoints },
+      { where: [{ id: userId }] },
+    );
+
+    // update rank_id if needed:
+    const ranks = await this.ranksRepository.find({
+      order: [['pointsThreshold', 'DESC']],
+    });
+    for (const rank of ranks) {
+      if (newPoints >= rank.pointsThreshold) {
+        await this.usersRepository.update(
+          { rankId: rank.id },
+          { where: [{ id: userId }] },
+        );
+        break;
+      }
+    }
+  }
+
+  async createTransaction(
+    storeId: number,
+    userId: number,
+    payload: CreateTransactionDto,
+  ): Promise<Transaction> {
+    const { amount, pointType } = payload;
+
+    const user = await this.usersRepository.findOne({
+      where: [{ id: userId }],
+    });
+    if (!user) {
+      ErrorHelper.NotFoundException(USER.USER_NOT_FOUND);
+    }
+
+    const userStore = await this.usersStoresRepository.findOne({
+      where: [{ storeId, userId }],
+    });
+    if (!userStore) {
+      ErrorHelper.BadRequestException('user has not been added to the store');
+    }
+
+    const rank = await this.ranksRepository.findOne({
+      where: [{ id: user.rankId }],
+    });
+
+    let point = 0;
+
+    if (pointType === EPointType.FIX) {
+      point = Math.floor(amount / rank.amount) * rank.fixedPoint;
+    } else {
+      point = Math.min(
+        Math.floor((amount / 1000) * rank.percentage),
+        rank.maxPercentagePoints,
+      );
+    }
+
+    await this.AddPoints(userId, point);
+    return await this.transactionsRepository.create({
+      ...payload,
+      userId,
+      storeId,
+      pointsEarned: point,
+      transactionDate: new Date(),
+    });
   }
 }

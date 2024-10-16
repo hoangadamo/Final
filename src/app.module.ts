@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 
 import { PostgresqlModule } from './database';
-import { UsersModule } from './modules';
+import { AuthModule, RanksModule, RewardsModule, StoresModule, UsersModule } from './modules';
 import { AppController } from './app.controller';
-import { AuthModule } from './modules/auth/auth.module';
-import { RanksModule } from './modules/ranks/ranks.module';
-import { StoresModule } from './modules/stores/stores.module';
 
 @Module({
   imports: [
@@ -14,6 +11,7 @@ import { StoresModule } from './modules/stores/stores.module';
     UsersModule,
     PostgresqlModule,
     AuthModule,
+    RewardsModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -5,6 +5,7 @@ import {
   RegisterDTO,
   SendOTPDto,
   StoreRegisterDTO,
+  UserLoginDTO,
   VerifyOTPDto,
 } from './dto';
 import { Store, User } from 'src/database';
@@ -110,6 +111,34 @@ export class AuthService {
     const user = await this.usersRepository.findOne({
       where: {
         email,
+      },
+    });
+
+    if (!user) {
+      ErrorHelper.BadRequestException(USER.USER_NOT_FOUND);
+    }
+
+    if (!user.isVerify) {
+      ErrorHelper.BadRequestException(USER.USER_NOT_VERIFIED);
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword)
+      ErrorHelper.BadRequestException(USER.INVALID_PASSWORD);
+
+    const token = this.generateToken({ id: user.id, isAdmin: user.isAdmin });
+    delete user.password;
+    return {
+      ...token,
+      user,
+    };
+  }
+
+  async userLogin(body: UserLoginDTO): Promise<ILoginResponse> {
+    const { password, phone } = body;
+    const user = await this.usersRepository.findOne({
+      where: {
+        phone,
       },
     });
 
