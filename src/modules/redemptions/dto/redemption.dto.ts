@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 export class CreateRedemptionDto {
@@ -14,9 +15,11 @@ export class CreateRedemptionDto {
 
 export class GetListRedemptionsDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()

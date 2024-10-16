@@ -1,4 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -40,9 +41,11 @@ export class CreateRankDTO {
 
 export class GetListRanksDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()

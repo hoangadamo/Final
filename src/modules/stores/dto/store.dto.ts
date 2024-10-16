@@ -1,10 +1,13 @@
+import { Type } from 'class-transformer';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class GetListStoresDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()

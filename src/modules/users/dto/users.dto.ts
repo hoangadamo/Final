@@ -1,17 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEmail, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class GetListUserDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()

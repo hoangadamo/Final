@@ -41,9 +41,11 @@ export class CreateRewardDto {
 
 export class GetListRewardsDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()
