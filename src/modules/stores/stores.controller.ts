@@ -16,6 +16,7 @@ import {
   ChangePasswordDto,
   CreateTransactionDto,
   GetListStoresDto,
+  GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
 import { StoreGuard } from 'src/utils';
@@ -33,7 +34,7 @@ export class StoresController {
     return await this.storesService.updateStore(id, payload);
   }
 
-  @Put(':id/approve')
+  @Put(':id/approval')
   async approve(@Param('id') id: number) {
     return this.storesService.approve(id);
   }
@@ -109,5 +110,25 @@ export class StoresController {
   ) {
     const storeId = req.store.id;
     return await this.storesService.createTransaction(storeId, userId, payload);
+  }
+
+  @UseGuards(StoreGuard)
+  @Get('transactions/list')
+  async getListTransactions(
+    @Query() payload: GetListTransactionDto,
+    @Req() req: ICustomRequest,
+  ) {
+    const storeId = req.store.id;
+    return await this.storesService.getListTransactions(storeId, payload);
+  }
+
+  @UseGuards(StoreGuard)
+  @Get('transactions/:id')
+  async getTransactionDetails(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: ICustomRequest,
+  ) {
+    const storeId = req.store.id;
+    return await this.storesService.getTransactionnDetails(storeId, id);
   }
 }

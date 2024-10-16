@@ -1,4 +1,5 @@
-import { IsEnum, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -11,4 +12,17 @@ export class CreateTransactionDto {
   })
   @IsNotEmpty()
   pointType: string;
+}
+
+export class GetListTransactionDto {
+  @IsOptional()
+  @Type(() => Number)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  limit?: number;
+
+  @IsOptional()
+  userId?: number;
 }

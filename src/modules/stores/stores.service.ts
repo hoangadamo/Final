@@ -5,6 +5,7 @@ import {
   ChangePasswordDto,
   CreateTransactionDto,
   GetListStoresDto,
+  GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
 import { IPaginationRes } from 'src/interfaces';
@@ -233,10 +234,7 @@ export class StoresService {
     return 'update password successful';
   }
 
-  async AddPoints(
-    userId: number,
-    point: number,
-  ): Promise<void> {
+  async AddPoints(userId: number, point: number): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: [{ id: userId }],
     });
@@ -307,5 +305,47 @@ export class StoresService {
       pointsEarned: point,
       transactionDate: new Date(),
     });
+  }
+
+  async getListTransactions(
+    storeId: number,
+    payload: GetListTransactionDto,
+  ): Promise<IPaginationRes<Transaction>> {
+    const { page, limit, userId } = payload;
+
+    const filters: any = {};
+    filters.storeId = storeId;
+
+    // filter by userId
+    if (userId) {
+      filters.userId = userId;
+    }
+
+    const options = {
+      where: filters,
+    };
+
+    if (page && limit) {
+      return await this.transactionsRepository.paginate(options, page, limit);
+    }
+
+    return await this.transactionsRepository.paginate(
+      options,
+      FIRST_PAGE,
+      LIMIT_PAGE,
+    );
+  }
+
+  async getTransactionnDetails(
+    storeId: number,
+    transactionId: number,
+  ): Promise<Transaction> {
+    const transaction = await this.transactionsRepository.findOne({
+      where: { id: transactionId, storeId },
+    });
+    if (!transaction) {
+      ErrorHelper.BadRequestException('transaction not found in the store');
+    }
+    return transaction;
   }
 }
