@@ -1,7 +1,15 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { RedemptionsService } from './redemptions.service';
 import { UserGuard } from 'src/utils';
-import { CreateRedemptionDto } from './dto';
+import { CreateRedemptionDto, GetListRedemptionsDto } from './dto';
 import { ICustomRequest } from 'src/interfaces';
 
 @Controller('redemptions')
@@ -15,5 +23,10 @@ export class RedemptionsController {
   ) {
     const userId = req.user.id;
     return await this.redemptionsService.createRedemption(userId, payload);
+  }
+
+  @Get()
+  async getListRedemptions(@Query() payload: GetListRedemptionsDto) {
+    return await this.redemptionsService.getListRedemptions(payload);
   }
 }

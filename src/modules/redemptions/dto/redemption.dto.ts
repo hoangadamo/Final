@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 export class CreateRedemptionDto {
   @IsNotEmpty()
@@ -10,4 +10,18 @@ export class CreateRedemptionDto {
   @Min(1)
   @Max(3)
   quantity: number;
+}
+
+export class GetListRedemptionsDto {
+  @IsOptional()
+  page?: number;
+
+  @IsOptional()
+  limit?: number;
+
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  userId?: number;
 }
