@@ -5,6 +5,8 @@ import {
   ChangePasswordDto,
   CreateTransactionDto,
   GetListStoresDto,
+  GetListStoreUsersDto,
+  GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
 import { IPaginationRes } from 'src/interfaces';
@@ -35,10 +37,13 @@ export class StoresService {
       ErrorHelper.NotFoundException('store not found');
     }
 
-    // toggle the isApproved status
-    const newStatus = !store.isApproved;
+    // check if store is verified
+    if (!store.isVerify) {
+      ErrorHelper.BadRequestException('store email has not been verified');
+    }
+
     await this.storesRepository.update(
-      { isApproved: newStatus },
+      { isApproved: true },
       { where: [{ id }] },
     );
 
@@ -158,7 +163,10 @@ export class StoresService {
     return 'successfully remove user from the store';
   }
 
-  async getListStoreUsers(id: number): Promise<User[]> {
+  async getListStoreUsers(
+    id: number,
+    payload: GetListStoreUsersDto,
+  ): Promise<IPaginationRes<User>> {
     const store = await this.storesRepository.findOne({
       where: [{ id }],
     });
@@ -170,10 +178,23 @@ export class StoresService {
       where: [{ storeId: id }],
     });
     const userIds = userStores.map((userStore) => userStore.userId);
-    return await this.usersRepository.find({
-      where: [{ id: userIds }],
+    const { page, limit, name } = payload;
+    const filters: any = {};
+
+    // search by name
+    if (name) {
+      filters.name = { [Op.iLike]: `%${name}%` };
+    }
+
+    const options = {
+      where: [filters, { id: userIds }],
       attributes: { exclude: ['password'] },
-    });
+    };
+    if (page && limit) {
+      return await this.usersRepository.paginate(options, page, limit);
+    }
+
+    return await this.usersRepository.paginate(options, FIRST_PAGE, LIMIT_PAGE);
   }
 
   async updateStore(id: number, payload: UpdateStoreDto): Promise<Store> {
@@ -233,10 +254,7 @@ export class StoresService {
     return 'update password successful';
   }
 
-  async AddPoints(
-    userId: number,
-    point: number,
-  ): Promise<void> {
+  async AddPoints(userId: number, point: number): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: [{ id: userId }],
     });
@@ -294,7 +312,7 @@ export class StoresService {
       point = Math.floor(amount / rank.amount) * rank.fixedPoint;
     } else {
       point = Math.min(
-        Math.floor((amount / 1000) * rank.percentage),
+        Math.floor((amount / 1000) * rank.percentage/100),
         rank.maxPercentagePoints,
       );
     }
@@ -307,5 +325,47 @@ export class StoresService {
       pointsEarned: point,
       transactionDate: new Date(),
     });
+  }
+
+  async getListTransactions(
+    storeId: number,
+    payload: GetListTransactionDto,
+  ): Promise<IPaginationRes<Transaction>> {
+    const { page, limit, userId } = payload;
+
+    const filters: any = {};
+    filters.storeId = storeId;
+
+    // filter by userId
+    if (userId) {
+      filters.userId = userId;
+    }
+
+    const options = {
+      where: filters,
+    };
+
+    if (page && limit) {
+      return await this.transactionsRepository.paginate(options, page, limit);
+    }
+
+    return await this.transactionsRepository.paginate(
+      options,
+      FIRST_PAGE,
+      LIMIT_PAGE,
+    );
+  }
+
+  async getTransactionnDetails(
+    storeId: number,
+    transactionId: number,
+  ): Promise<Transaction> {
+    const transaction = await this.transactionsRepository.findOne({
+      where: { id: transactionId, storeId },
+    });
+    if (!transaction) {
+      ErrorHelper.BadRequestException('transaction not found in the store');
+    }
+    return transaction;
   }
 }

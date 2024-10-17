@@ -4,8 +4,10 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   Min,
 } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
 export class CreateRankDTO {
   @IsNotEmpty()
@@ -30,6 +32,7 @@ export class CreateRankDTO {
   @IsNotEmpty()
   @IsNumber()
   @Min(0, { message: 'percentage must be a non-negative number' })
+  @Max(100, {message: 'maximum percentage is 100'})
   percentage: number;
 
   @IsNotEmpty()
@@ -38,13 +41,7 @@ export class CreateRankDTO {
   maxPercentagePoints: number;
 }
 
-export class GetListRanksDto {
-  @IsOptional()
-  page?: number;
-
-  @IsOptional()
-  limit?: number;
-
+export class GetListRanksDto extends PaginationDto {
   @IsOptional()
   sort?: 'ASC' | 'DESC';
 }
