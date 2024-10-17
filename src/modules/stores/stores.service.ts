@@ -42,9 +42,8 @@ export class StoresService {
       ErrorHelper.BadRequestException('store email has not been verified');
     }
 
-    const newStatus = !store.isApproved;
     await this.storesRepository.update(
-      { isApproved: newStatus },
+      { isApproved: true },
       { where: [{ id }] },
     );
 
