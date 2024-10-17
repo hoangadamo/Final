@@ -19,6 +19,7 @@ import { UsersService } from './users.services';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'API Get list of users' })
   @Get()
   async getListUsers(@Query() payload: GetListUserDto) {
     return await this.usersService.getListUsers(payload);
