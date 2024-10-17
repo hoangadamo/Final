@@ -20,15 +20,16 @@ import {
   GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
-import { StoreGuard } from 'src/utils';
+import { AdminGuard, StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('stores')
 @Controller('stores')
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
+  @ApiOperation({ summary: 'API Update store' })
   @Put(':id')
   async updateStore(
     @Param('id', ParseIntPipe) id: number,
@@ -37,11 +38,14 @@ export class StoresController {
     return await this.storesService.updateStore(id, payload);
   }
 
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'API Admin approve store' })
   @Put(':id/approval')
   async approve(@Param('id') id: number) {
     return this.storesService.approve(id);
   }
 
+  @ApiOperation({ summary: 'API change password store' })
   @Put(':id/change-password')
   async changePassword(
     @Param('id', ParseIntPipe) id: number,
@@ -50,21 +54,25 @@ export class StoresController {
     return await this.storesService.changePassword(id, payload);
   }
 
+  @ApiOperation({ summary: 'API get list of store' })
   @Get()
   async getListStores(@Query() payload: GetListStoresDto) {
     return await this.storesService.getListStores(payload);
   }
 
+  @ApiOperation({ summary: 'API get store details' })
   @Get(':id')
   async getStoreDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.storesService.getStoreDetails(id);
   }
 
+  @ApiOperation({ summary: 'API delete store' })
   @Delete(':id')
   async deleteStore(@Param('id', ParseIntPipe) id: number) {
     return await this.storesService.deleteStore(id);
   }
 
+  @ApiOperation({ summary: 'API add user to store' })
   @UseGuards(StoreGuard)
   @Post('users/:userId')
   async addUser(
@@ -75,6 +83,7 @@ export class StoresController {
     return await this.storesService.addUser(storeId, userId);
   }
 
+  @ApiOperation({ summary: 'API remove user from store' })
   @UseGuards(StoreGuard)
   @Delete('users/:userId')
   async removeUser(
@@ -85,6 +94,7 @@ export class StoresController {
     return await this.storesService.removeUser(storeId, userId);
   }
 
+  @ApiOperation({ summary: 'API get list of store users' })
   @UseGuards(StoreGuard)
   @Get('users/list')
   async getListStoreUsers(
@@ -107,6 +117,7 @@ export class StoresController {
   //   return 'add points successfully';
   // }
 
+  @ApiOperation({ summary: 'API store add points to user' })
   @UseGuards(StoreGuard)
   @Post('users/:userId/points')
   async addPoints(
@@ -118,6 +129,7 @@ export class StoresController {
     return await this.storesService.createTransaction(storeId, userId, payload);
   }
 
+  @ApiOperation({ summary: 'API get list of transactions' })
   @UseGuards(StoreGuard)
   @Get('transactions/list')
   async getListTransactions(
@@ -128,6 +140,7 @@ export class StoresController {
     return await this.storesService.getListTransactions(storeId, payload);
   }
 
+  @ApiOperation({ summary: 'API get transation details' })
   @UseGuards(StoreGuard)
   @Get('transactions/:id')
   async getTransactionDetails(
