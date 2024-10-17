@@ -3,22 +3,22 @@
 ## Loyalty System
 
 ### Admin
-+ Quản lý danh sách tất cả các user (CRUD)
-+ Quản lý danh sách tất cả các store (CRUD)
-+ Phê duyệt cửa hàng mới khi đăng ký
++ Manage the list of all users (CRUD)
++ Manage the list of all stores (CRUD)
++ Approve new stores
 ### Store
-+ Đăng ký (verify OTP), đăng nhập bằng email (phải đã được duyệt)
-+ Quản lý danh sách user tại cửa hàng
-+ Tích điểm cho user
-+ Tạo danh sách các item dùng để đổi quà (tên, điểm đổi, ảnh, thời hạn, số lượng, mô tả)
++ Register (verify OTP), log in via email (must be approved)
++ Manage the list of users of the store
++ Accumulate points for users
++ Create a list of items for redemption (name, points required, image, expiration date, quantity, description)
 ### User
-+ User đăng ký tài khoản và đổi quà tại tất cả các store của hệ thống
-+ User đăng ký/đăng nhập bằng số điện thoại và gửi OTP để xác nhận
-+ Khi user mua hàng tại cửa hàng, số điểm tích cho user được chia làm 2 dạng:
-    - Tích điểm cố định (Ví dụ: 100k tích 5 điểm, 200k tích 10 điểm)
-    - Tích điểm theo phần trăm giá trị đơn hàng
-+ Số điểm tích của user sẽ được chia thành các cấp bậc rank(mặc định khi đăng ký sẽ là rank đồng)
-    - Rank đồng(default): Cứ mỗi 100k được tích 5 điểm hoặc được tích 10% tối đa 50 điểm 
-    - Rank bạc (khi tích được 2000 điểm sẽ lên rank): Cứ mỗi 100k được tích 10 điểm hoặc tích 15% tối đa 100 điểm 
-    - Rank vàng (khi tích được 5000 điểm sẽ lên rank): Cứ mỗi 100k được tích 15 điểm hoặc được tích 20% tối đa 200 điểm
-+ Đổi sản phẩm (mỗi lần user chỉ được đổi tối đa 3 item, và số điểm tối đa có thể đổ là 1000 điểm/lần)
++ Users register accounts and redeem rewards at all stores in the system
++ Users register/log in via phone number and send OTP for verification
++ When users make purchases at stores, their points are accumulated in two ways:
+    - Fixed points (e.g., 100k earns 5 points, 200k earns 10 points)
+    - Percentage of the order value
++ User points are divided into rank levels (default rank upon registration is Bronze):
+    - Bronze Rank (default): Every 100k earns 5 points or 10% up to 50 points
+    - Silver Rank (achieved at 2000 points): Every 100k earns 10 points or 15% up to 100 points 
+    - Gold Rank (achieved at 5000 points): Every 100k earns 15 points or 20% up to 200 points
++ Redeem products (each user can redeem up to 3 items at a time, with a maximum of 1000 points per redemption)
