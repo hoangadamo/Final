@@ -25,11 +25,13 @@ export class UsersController {
     return await this.usersService.getListUsers(payload);
   }
 
+  @ApiOperation({ summary: 'API User details' })
   @Get(':id')
   async getUserDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.getUserDetails(id);
   }
 
+  @ApiOperation({ summary: 'API Update user' })
   @Put(':id')
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
@@ -39,6 +41,7 @@ export class UsersController {
     return user;
   }
 
+  @ApiOperation({ summary: 'API Change password user' })
   @Put(':id/change-password')
   async changePassword(
     @Param('id', ParseIntPipe) id: number,
@@ -47,6 +50,7 @@ export class UsersController {
     return await this.usersService.changePassword(id, payload);
   }
 
+  @ApiOperation({ summary: 'API Delete user' })
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.deleteUser(id);
