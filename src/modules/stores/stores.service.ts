@@ -5,6 +5,7 @@ import {
   ChangePasswordDto,
   CreateTransactionDto,
   GetListStoresDto,
+  GetListStoreUsersDto,
   GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
@@ -163,7 +164,10 @@ export class StoresService {
     return 'successfully remove user from the store';
   }
 
-  async getListStoreUsers(id: number): Promise<User[]> {
+  async getListStoreUsers(
+    id: number,
+    payload: GetListStoreUsersDto,
+  ): Promise<IPaginationRes<User>> {
     const store = await this.storesRepository.findOne({
       where: [{ id }],
     });
@@ -175,10 +179,23 @@ export class StoresService {
       where: [{ storeId: id }],
     });
     const userIds = userStores.map((userStore) => userStore.userId);
-    return await this.usersRepository.find({
-      where: [{ id: userIds }],
+    const { page, limit, name } = payload;
+    const filters: any = {};
+
+    // search by name
+    if (name) {
+      filters.name = { [Op.iLike]: `%${name}%` };
+    }
+
+    const options = {
+      where: [filters, { id: userIds }],
       attributes: { exclude: ['password'] },
-    });
+    };
+    if (page && limit) {
+      return await this.usersRepository.paginate(options, page, limit);
+    }
+
+    return await this.usersRepository.paginate(options, FIRST_PAGE, LIMIT_PAGE);
   }
 
   async updateStore(id: number, payload: UpdateStoreDto): Promise<Store> {

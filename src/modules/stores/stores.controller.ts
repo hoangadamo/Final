@@ -16,6 +16,7 @@ import {
   ChangePasswordDto,
   CreateTransactionDto,
   GetListStoresDto,
+  GetListStoreUsersDto,
   GetListTransactionDto,
   UpdateStoreDto,
 } from './dto';
@@ -84,9 +85,12 @@ export class StoresController {
 
   @UseGuards(StoreGuard)
   @Get('users/list')
-  async getListStoreUsers(@Req() req: ICustomRequest) {
+  async getListStoreUsers(
+    @Req() req: ICustomRequest,
+    @Query() payload: GetListStoreUsersDto,
+  ) {
     const storeId = req.store.id;
-    return await this.storesService.getListStoreUsers(storeId);
+    return await this.storesService.getListStoreUsers(storeId, payload);
   }
 
   // @UseGuards(StoreGuard)

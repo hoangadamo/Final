@@ -90,7 +90,7 @@ export class RedemptionsService {
   async getListRedemptions(
     payload: GetListRedemptionsDto,
   ): Promise<IPaginationRes<Redemption>> {
-    const { page, limit, name, userId } = payload;
+    const { page, limit, rewardName, userId } = payload;
 
     const filters: any = {};
 
@@ -99,9 +99,9 @@ export class RedemptionsService {
       filters.userId = userId;
     }
 
-    // search by name
-    if (name) {
-      filters.name = { [Op.iLike]: `%${name}%` };
+    // search by rewardName
+    if (rewardName) {
+      filters.rewardName = { [Op.iLike]: `%${rewardName}%` };
     }
 
     const options = {

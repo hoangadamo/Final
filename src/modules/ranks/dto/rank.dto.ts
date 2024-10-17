@@ -1,5 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -7,6 +6,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
 export class CreateRankDTO {
   @IsNotEmpty()
@@ -39,15 +39,7 @@ export class CreateRankDTO {
   maxPercentagePoints: number;
 }
 
-export class GetListRanksDto {
-  @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
+export class GetListRanksDto extends PaginationDto {
   @IsOptional()
   sort?: 'ASC' | 'DESC';
 }

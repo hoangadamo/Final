@@ -1,16 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { IsEmail, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
-export class GetListUserDto {
-  @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
+export class GetListUserDto extends PaginationDto {
   @IsOptional()
   name?: string;
 

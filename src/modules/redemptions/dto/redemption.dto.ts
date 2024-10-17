@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
 export class CreateRedemptionDto {
   @IsNotEmpty()
@@ -13,17 +14,9 @@ export class CreateRedemptionDto {
   quantity: number;
 }
 
-export class GetListRedemptionsDto {
+export class GetListRedemptionsDto extends PaginationDto {
   @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
-  @IsOptional()
-  name?: string;
+  rewardName?: string;
 
   @IsOptional()
   userId?: number;

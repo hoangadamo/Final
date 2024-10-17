@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -14,15 +15,7 @@ export class CreateTransactionDto {
   pointType: string;
 }
 
-export class GetListTransactionDto {
-  @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
+export class GetListTransactionDto extends PaginationDto {
   @IsOptional()
   userId?: number;
 }

@@ -10,6 +10,7 @@ import {
   Min,
   MinDate,
 } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
 export class CreateRewardDto {
   @IsNotEmpty()
@@ -39,15 +40,7 @@ export class CreateRewardDto {
   description?: string;
 }
 
-export class GetListRewardsDto {
-  @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
+export class GetListRewardsDto extends PaginationDto {
   @IsOptional()
   name?: string;
 

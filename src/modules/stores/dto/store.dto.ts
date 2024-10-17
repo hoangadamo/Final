@@ -1,15 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { PaginationDto } from 'src/constants/dto';
 
-export class GetListStoresDto {
-  @IsOptional()
-  @Type(() => Number)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  limit?: number;
-
+export class GetListStoresDto extends PaginationDto {
   @IsOptional()
   name?: string;
 
@@ -28,4 +21,9 @@ export class UpdateStoreDto {
   @IsOptional()
   @IsEmail()
   email: string;
+}
+
+export class GetListStoreUsersDto extends PaginationDto {
+  @IsOptional()
+  name?: string;
 }
