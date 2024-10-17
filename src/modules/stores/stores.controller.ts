@@ -22,7 +22,9 @@ import {
 } from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('stores')
 @Controller('stores')
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}

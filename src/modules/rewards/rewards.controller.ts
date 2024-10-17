@@ -18,7 +18,9 @@ import { CreateRewardDto, GetListRewardsDto, UpdateRewardDto } from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('rewards')
 @Controller('rewards')
 export class RewardsController {
   constructor(private readonly rewardsService: RewardsService) {}

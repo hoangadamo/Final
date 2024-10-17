@@ -13,7 +13,9 @@ import { RedemptionsService } from './redemptions.service';
 import { UserGuard } from 'src/utils';
 import { CreateRedemptionDto, GetListRedemptionsDto } from './dto';
 import { ICustomRequest } from 'src/interfaces';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('redemptions')
 @Controller('redemptions')
 export class RedemptionsController {
   constructor(private readonly redemptionsService: RedemptionsService) {}

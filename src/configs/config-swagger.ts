@@ -6,7 +6,12 @@ export const swaggerConfig = (app: NestExpressApplication): void => {
     .setTitle('Loyalty System')
     .setDescription('This is the API documentation!')
     .setVersion('1.0')
+    .addTag('auth')
     .addTag('users')
+    .addTag('stores')
+    .addTag('ranks')
+    .addTag('redemptions')
+    .addTag('rewards')
     .addBearerAuth()
     .addSecurity('basic', {
       type: 'http',
