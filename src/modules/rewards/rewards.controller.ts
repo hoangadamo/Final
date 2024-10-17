@@ -18,13 +18,19 @@ import { CreateRewardDto, GetListRewardsDto, UpdateRewardDto } from './dto';
 import { StoreGuard } from 'src/utils';
 import { ICustomRequest } from 'src/interfaces';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('rewards')
 @Controller('rewards')
 export class RewardsController {
   constructor(private readonly rewardsService: RewardsService) {}
 
+  @ApiOperation({ summary: 'API Create reward' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Reward creation payload',
+    type: CreateRewardDto,
+  }, )
   @UseGuards(StoreGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
@@ -38,16 +44,19 @@ export class RewardsController {
     return await this.rewardsService.createReward(storeId, payload, imageUrl);
   }
 
+  @ApiOperation({ summary: 'API Get list of rewards' })
   @Get()
   async getListRewards(@Query() payload: GetListRewardsDto) {
     return this.rewardsService.getListRewards(payload);
   }
 
+  @ApiOperation({ summary: 'API Get reward details' })
   @Get(':id')
   async getRewardDetails(@Param('id', ParseIntPipe) id: number) {
     return await this.rewardsService.getRewardDetails(id);
   }
 
+  @ApiOperation({ summary: 'API Update reward' })
   @Put(':id')
   async updateReward(
     @Param('id', ParseIntPipe) id: number,
@@ -57,9 +66,23 @@ export class RewardsController {
     return user;
   }
 
+  @ApiOperation({ summary: 'API Change reward image' })
   @UseGuards(StoreGuard)
   @Put(':id/change-image')
   @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Image file',
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async changeImage(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
@@ -71,6 +94,7 @@ export class RewardsController {
     return user;
   }
 
+  @ApiOperation({ summary: 'API Delete reward' })
   @Delete(':id')
   async deleteReward(@Param('id', ParseIntPipe) id: number) {
     return await this.rewardsService.deleteReward(id);
