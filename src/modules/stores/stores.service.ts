@@ -312,7 +312,7 @@ export class StoresService {
       point = Math.floor(amount / rank.amount) * rank.fixedPoint;
     } else {
       point = Math.min(
-        Math.floor((amount / 1000) * rank.percentage),
+        Math.floor((amount / 1000) * rank.percentage/100),
         rank.maxPercentagePoints,
       );
     }
