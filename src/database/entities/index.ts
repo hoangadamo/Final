@@ -5,3 +5,4 @@ export * from './user-store.model';
 export * from './rewards.model';
 export * from './transactions.model';
 export * from './redemptions.model';
+export * from './messages.model';
